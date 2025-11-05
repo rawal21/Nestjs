@@ -7,13 +7,13 @@ import { JwtStrategy } from './jwt.strategy';
 
 @Module({
   imports: [
-    UsersModule,  // ✅ imports UsersService + UserModel
+    UsersModule, // ✅ imports UsersService + UserModel
     JwtModule.register({
       secret: 'whywouldishare',
       signOptions: { expiresIn: '1d' },
     }),
   ],
-  providers: [AuthService ,  JwtStrategy], // ✅ REMOVE UsersService
+  providers: [AuthService, JwtStrategy], // ✅ REMOVE UsersService
   controllers: [AuthController],
 })
 export class AuthModule {}

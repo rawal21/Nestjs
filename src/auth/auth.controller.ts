@@ -5,16 +5,15 @@ import { CreateLoginDto } from './dto/login/login.dto';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService : AuthService){}
+  constructor(private authService: AuthService) {}
   @Post('signup')
-  signup(@Body() body : CreateSignUpDto)
-  {
-       return this.authService.signup(body.name , body.email , body.password);
+  signup(@Body() body: CreateSignUpDto) {
+    return this.authService.signup(body.name, body.email, body.password);
   }
 
   @Post('login')
-   login(@Body() body : CreateLoginDto)
-   {
-     return this.authService.login(body.email , body.password);
-   }
+  login(@Body() body: CreateLoginDto) {
+    console.log(body);
+    return this.authService.login(body.email, body.password);
+  }
 }

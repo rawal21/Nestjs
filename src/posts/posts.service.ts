@@ -1,28 +1,30 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post } from './post.schema';
 import { Model } from 'mongoose';
+import { Post } from './post.schema';
+import { CreatePostDto } from './dto/create-psot-dto/createPost.dto';
 
 @Injectable()
 export class PostsService {
-  constructor(@InjectModel(Post.name) private postModel : Model<Post>){}
+  constructor(@InjectModel(Post.name) private postModel: Model<Post>) {}
 
-  async createPost(data , userId)
-  {
-      const slug = data.title.toLowerCase().replace(/\s+/g, '-');
-      const newpost = await this.postModel.create({
-        ...data,
-        slug ,
-        author : userId
-      });
+  async createPost(data: CreatePostDto, userId: string, imageUrl?: string) {
+    const slug = data.title.toLowerCase().replace(/\s+/g, '-');
 
-      return newpost.save();
+    const newPost = await this.postModel.create({
+      ...data,
+      slug,
+      image: imageUrl ?? null, // ✅ store image url
+      author: userId,
+    });
+
+    return newPost;
   }
 
-  async findAll(query)
-  {
-    const {page = 1 , limit = 5 , search = ''} = query ;
-     return this.postModel
+  async findAll(query) {
+    const { page = 1, limit = 5, search = '' } = query;
+
+    return this.postModel
       .find({ title: { $regex: search, $options: 'i' } })
       .populate('author', 'name email role')
       .skip((page - 1) * limit)
@@ -30,22 +32,18 @@ export class PostsService {
       .exec();
   }
 
-  async findBySlug(slug)
-  {
-    return this.postModel.findOne({slug}).populate("author" ,' name email')
+  async findBySlug(slug: string) {
+    return this.postModel.findOne({ slug }).populate('author', 'name email');
   }
 
-  async deletePost(slug , user)
-  {
-    const post = await this.postModel.findOne({slug});
-    if(!post) return null;
+  async deletePost(slug: string, user: any) {
+    const post = await this.postModel.findOne({ slug });
+    if (!post) return null;
 
-    if(user.role === 'admin' || post.author.toString() === user.userId )
-    {
-       return post.deleteOne();
+    if (user.role !== 'admin' && post.author.toString() !== user.userId) {
+      throw new UnauthorizedException('You cannot delete this post.');
     }
 
-    return "Unauthorized to delete this post."
-
+    return post.deleteOne();
   }
 }

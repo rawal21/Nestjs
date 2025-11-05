@@ -1,27 +1,30 @@
-import { IsNotEmpty, IsOptional, IsString, MinLength } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class CreatePostDto{
+export class CreatePostDto {
   @IsString()
   @IsNotEmpty()
-  title : string
+  title: string;
   @IsString()
   @IsNotEmpty()
   @MinLength(10)
-  content : string
+  content: string;
 
   @IsString()
   @IsNotEmpty()
-  slug : string 
+  slug: string;
 
   @IsString()
   @IsNotEmpty()
-  author : string 
+  author: string;
 
   @IsString()
   @IsOptional()
-  tags? : string[]
-  
+  tags?: string[];
+
   @IsString()
   @IsOptional()
-  category : string
+  category: string;
+
+  @IsOptional()
+  imageUrl: string;
 }
