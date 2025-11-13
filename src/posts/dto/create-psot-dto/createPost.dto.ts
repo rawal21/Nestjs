@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { Types } from 'mongoose';
 
 export class CreatePostDto {
   @IsString()
@@ -15,7 +16,7 @@ export class CreatePostDto {
 
   @IsString()
   @IsNotEmpty()
-  author: string;
+  author: Types.ObjectId | string;
 
   @IsString()
   @IsOptional()

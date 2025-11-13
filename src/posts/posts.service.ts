@@ -22,14 +22,37 @@ export class PostsService {
   }
 
   async findAll(query) {
-    const { page = 1, limit = 5, search = '' } = query;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const page = Math.max(1, Number(query.page) || 1);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const limit = Math.max(1, Number(query.limit) || 10);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const search = query.search || '';
+    const skip = (page - 1) * limit;
 
-    return this.postModel
-      .find({ title: { $regex: search, $options: 'i' } })
+    // Filter condition
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const filter = { title: { $regex: search, $options: 'i' } };
+
+    // Fetch posts
+    const posts = await this.postModel
+      .find(filter)
+      // eslint-disable-next-line prettier/prettier
       .populate('author', 'name email role')
-      .skip((page - 1) * limit)
-      .limit(Number(limit))
+      .skip(skip)
+      .limit(limit)
       .exec();
+
+    // Count total documents
+    const totalPosts = await this.postModel.countDocuments(filter);
+
+    // Return both
+    return {
+      posts,
+      totalPosts,
+      currentPage: page,
+      totalPages: Math.ceil(totalPosts / limit),
+    };
   }
 
   async findBySlug(slug: string) {
@@ -40,6 +63,7 @@ export class PostsService {
     const post = await this.postModel.findOne({ slug });
     if (!post) return null;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (user.role !== 'admin' && post.author.toString() !== user.userId) {
       throw new UnauthorizedException('You cannot delete this post.');
     }

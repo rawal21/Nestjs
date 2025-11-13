@@ -6,16 +6,26 @@ import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { PostsModule } from './posts/posts.module';
 import { CommentsModule } from './comments/comments.module';
-
+import { RedisModule } from './redis/redis.module';
+import { PaymentService } from './payment/payment.service';
+import { PaymentController } from './payment/payment.controller';
+import { PaymentModule } from './payment/payment.module';
+import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     AuthModule,
     UsersModule,
-    MongooseModule.forRoot('mongodb://localhost:27017/nest-blog'),
+    MongooseModule.forRoot(process.env.MONGO_URl || ''),
     PostsModule,
     CommentsModule,
+    RedisModule,
+    PaymentModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, PaymentController],
+  providers: [AppService, PaymentService],
 })
 export class AppModule {}

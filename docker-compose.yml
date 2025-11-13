@@ -1,0 +1,34 @@
+services:
+  app:
+    build: .
+    container_name: nest-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+      - redis
+    command: npm run start:prod
+
+  mongo:
+    image: mongo:6
+    container_name: nest-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: nestdb
+
+  redis:
+    image: redis:7
+    container_name: nest-redis
+    restart: always
+    ports:
+      - "6379:6379"
+
+volumes:
+  mongo-data:

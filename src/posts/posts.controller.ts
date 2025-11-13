@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   Body,
   Controller,
@@ -13,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-psot-dto/createPost.dto';
-import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
+import { JwtAuthGuard } from '../auth/jwt/jwt.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -72,6 +73,7 @@ export class PostsController {
         ...body,
         imageUrl: `/uploads/${file.filename}`, // store file path
       },
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       req.user.userId,
     );
   }
